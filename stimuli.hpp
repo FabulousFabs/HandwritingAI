@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <vector>
+#include <stdlib.h>
 
 #include "filesys.hpp"
 
@@ -19,6 +20,15 @@
 #include "CImg.h"
 
 namespace stimuli {
+    struct Stimulus
+    {
+        std::vector<float> GS;
+        std::vector<float> GSD;
+        std::string Type;
+        std::string Variant;
+        int Correct;
+    };
+    
     int LoadStimuli(std::string path, std::string format);
     int LoadStimulus(std::string path, std::string file);
 }
