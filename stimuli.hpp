@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <stdlib.h>
+#include <regex>
 
 #include "filesys.hpp"
 
@@ -20,17 +21,27 @@
 #include "CImg.h"
 
 namespace stimuli {
+    enum Type
+    {
+        Zero = 0, One, Two, Three, Four, Five, Six, Seven, Eight, Nine,
+        Last = Nine
+    };
+    
+    static const std::string TypesAsStrings[10] = {"ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE"};
+    
     struct Stimulus
     {
         std::vector<float> GS;
         std::vector<float> GSD;
         std::string Type;
         std::string Variant;
-        int Correct;
+        enum Type Correct;
     };
     
-    int LoadStimuli(std::string path, std::string format);
+    void LoadStimuli(std::string path, std::string format, std::vector<Stimulus> &Stimulus);
     void LoadStimulus(std::string path, std::string file, std::vector<Stimulus> &Stimulus);
+    std::string GetTypeAsString(enum Type &num);
+    enum Type GetTypeFromString(std::string &str);
 }
 
 #endif /* stimuli_hpp */

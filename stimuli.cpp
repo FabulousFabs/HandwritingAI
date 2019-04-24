@@ -10,21 +10,38 @@
 
 using namespace stimuli;
 
-int stimuli::LoadStimuli(std::string path, std::string format) {
+enum Type stimuli::GetTypeFromString (std::string &str) {
+    for (int i = 0; i < Last; i++) {
+        Type t = static_cast<Type>(i);
+        if (GetTypeAsString(t) == str) {
+            return t;
+        }
+    }
+    return static_cast<Type>(0);
+}
+
+std::string stimuli::GetTypeAsString (enum Type &num) {
+    return TypesAsStrings[num];
+}
+
+void stimuli::LoadStimuli(std::string path, std::string format, std::vector<Stimulus> &Stimuli) {
     std::vector<std::string> Files = filesys::ScanDirectoryByFiletype(path, format);
-    std::vector<Stimulus> Stimuli;
     
     for (auto&& fn: Files) {
-        std::cout << "Loading " << fn << "..." << std::endl;
-        
         LoadStimulus(path, fn, Stimuli);
     }
-    
-    return 0;
 }
 
 void stimuli::LoadStimulus(std::string path, std::string file, std::vector<Stimulus> &Stimuli) {
     Stimulus stim;
+    
+    std::string fd = file.substr(0, file.find_last_of("."));
+    std::regex strings("[^a-zA-Z]+");
+    std::regex numbers("[^0-9]+");
+    
+    stim.Type = std::regex_replace(fd, strings, "");
+    stim.Variant = std::regex_replace(fd, numbers, "");
+    stim.Correct = GetTypeFromString(stim.Type);
     
     const std::string fp = path + file;
     cimg_library::CImg<unsigned char> image(fp.c_str());
@@ -45,7 +62,6 @@ void stimuli::LoadStimulus(std::string path, std::string file, std::vector<Stimu
             
             stim.GS.push_back(greyscale);
             stim.GSD.push_back(greyscaledark);
-            
         }
     }
     

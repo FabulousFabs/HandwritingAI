@@ -12,10 +12,13 @@ const std::string DirImages = "/users/fabianschneider/desktop/CppCNNHandwriting/
 const std::string ImageFormat = "png";
 
 int main (int argc, const char *argv[]) {
-    stimuli::LoadStimuli(DirImages, ImageFormat);
+    std::vector<stimuli::Stimulus> Stimuli;
+    stimuli::LoadStimuli(DirImages, ImageFormat, Stimuli);
     
     system("clear"); // libpng prints ugly iccp warnings bc it's stupid...
-    std::cout << "Done." << std::endl;
+    std::cout << "Stimuli are now loaded." << std::endl;
+    
+    
     
     return 0;
 }

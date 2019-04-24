@@ -18,7 +18,7 @@ std::vector<std::string> filesys::ScanDirectoryByFiletype (std::string path, std
     
     while ((dp = readdir(dirp)) != NULL) {
         const std::string fn = std::string(dp->d_name);
-    
+        
         if (fn.substr(fn.find_last_of(".") + 1) == format) {
             files.push_back(fn);
         }
