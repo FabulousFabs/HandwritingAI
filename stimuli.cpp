@@ -12,17 +12,18 @@ using namespace stimuli;
 
 int stimuli::LoadStimuli(std::string path, std::string format) {
     std::vector<std::string> Files = filesys::ScanDirectoryByFiletype(path, format);
+    std::vector<Stimulus> Stimuli;
     
     for (auto&& fn: Files) {
         std::cout << "Loading " << fn << "..." << std::endl;
         
-        LoadStimulus(path, fn);
+        LoadStimulus(path, fn, Stimuli);
     }
     
     return 0;
 }
 
-int stimuli::LoadStimulus(std::string path, std::string file) {
+void stimuli::LoadStimulus(std::string path, std::string file, std::vector<Stimulus> &Stimuli) {
     Stimulus stim;
     
     const std::string fp = path + file;
@@ -45,13 +46,8 @@ int stimuli::LoadStimulus(std::string path, std::string file) {
             stim.GS.push_back(greyscale);
             stim.GSD.push_back(greyscaledark);
             
-            //std::cout << "f(X=" << x << ", Y=" << y << ")=GS" << greyscale << ";GSD=" << greyscaledark << std::endl;
-            
-            /*std::cout << "f(X=" << x << ", Y=" << y << ") = R(" << (int) *r << ")G(" << (int) *g << ")B(" << (int) *b << ")" << std::endl;*/
         }
     }
     
-    //std::cout << "Width=" << image.width() << "; Height=" << image.height() << std::endl;
-    
-    return 0;
+    Stimuli.push_back(stim);
 }

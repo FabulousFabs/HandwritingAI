@@ -30,7 +30,7 @@ namespace stimuli {
     };
     
     int LoadStimuli(std::string path, std::string format);
-    int LoadStimulus(std::string path, std::string file);
+    void LoadStimulus(std::string path, std::string file, std::vector<Stimulus> &Stimulus);
 }
 
 #endif /* stimuli_hpp */
