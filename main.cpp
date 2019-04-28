@@ -18,6 +18,8 @@ int main (int argc, const char *argv[]) {
     system("clear"); // libpng prints ugly iccp warnings bc it's stupid...
     std::cout << "Stimuli are now loaded." << std::endl;
     
+    std::vector<int> circuit_structure = brain::MakeCircuitVector(3, 256, 64, 10);
+    brain::CNN cnn(circuit_structure, 0.5, brain::ACTIVATION_TANH);
     
     
     return 0;
