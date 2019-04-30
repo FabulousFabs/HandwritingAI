@@ -13,9 +13,10 @@
 #include <stdarg.h>
 #include <math.h>
 #include <algorithm>
+#include <vector>
 
 namespace brain {
-    std::vector<int> MakeCircuitVector(int n_args, ...);
+    //std::vector<int> MakeCircuitVector(int n_args, ...);
     float MakeRandomP();
     float MakeRandomN();
     float MakeRandomNP();
@@ -39,6 +40,16 @@ namespace brain {
     
     float ActivationReLu(float in);
     float DerivativeReLu(float in);
+    
+    float Activate(float in, enum ACTIVATION_FUNC af);
+    float Derive(float in, enum ACTIVATION_FUNC af);
+    
+    std::vector<std::vector<float>> MatrixDot(std::vector<std::vector<float>> m1, std::vector<std::vector<float>> m2);
+    void MatrixFill(bool r, float f, int u, std::vector<std::vector<float>> &m);
+    void MatrixOnes(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
+    void MatrixZeroes(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
+    void MatrixFit(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
+    std::vector<std::vector<float>> MatrixT(std::vector<std::vector<float>> &m);
 }
 
 #include "brain_cnn.hpp"

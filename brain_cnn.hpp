@@ -2,7 +2,7 @@
 //  brain_cnn.hpp
 //  CppCNNHandwriting
 //
-//  Created by Fabian Schneider on 28.04.19.
+//  Created by Fabian Schneider on 30.04.19.
 //  Copyright © 2019 Fabian Schneider. All rights reserved.
 //
 
@@ -11,25 +11,67 @@
 
 #include <iostream>
 #include <vector>
+#include <stdio.h>
+#include <algorithm>
+#include <stdarg.h>
+#include <tuple>
 
 #include "brain.hpp"
 
 namespace brain {
-    // convolutional neural network
+    enum CNN_LAYER_TYPE
+    {
+        CNN_LAYER_T_FLATTEN = 0,
+        CNN_LAYER_T_DENSE,
+    };
+    
+    class layer_proto
+    {
+    protected:
+        enum CNN_LAYER_TYPE e_iType;
+        enum ACTIVATION_FUNC e_iActivationFunc;
+        int i_nNeurons;
+        int i_nWeights;
+    public:
+        std::vector<float> v_fNeurons;
+        std::vector<float> v_fNeuronsOut;
+        std::vector<float> v_fWeights;
+        
+        void Grow();
+        void Neuroplasticity(int n);
+    };
+    
+    namespace layer {
+        class flatten_proto: public layer_proto
+        {
+        private:
+            
+        public:
+            flatten_proto(int n, enum ACTIVATION_FUNC af);
+        };
+        
+        class dense_proto: public layer_proto
+        {
+        private:
+            
+        public:
+            dense_proto(int n, enum ACTIVATION_FUNC af);
+        };
+        
+        std::tuple<enum CNN_LAYER_TYPE, int, enum ACTIVATION_FUNC> Flatten(int n_args, ...);
+        std::tuple<enum CNN_LAYER_TYPE, int, enum ACTIVATION_FUNC> Dense(int neurons, enum ACTIVATION_FUNC af);
+    }
+    
     class CNN
     {
     private:
-        std::vector<std::vector<int>> v_iCircuit;
-        std::vector<std::vector<int>> v_iCircuitNet;
-        std::vector<std::vector<std::vector<float>>> v_fWeights;
-        enum ACTIVATION_FUNC e_iFunction;
-        float f_Eta;
-        
+        std::vector<layer_proto> Layers;
+        bool b_IsCompiled;
     public:
-        CNN(std::vector<int> &circuit_structure, float learning_rate, enum ACTIVATION_FUNC af);
-        int Perceive(std::vector<float> &stimulus);
-        void AssumeRestingState();
-        void Feedback(int percept, int correct, std::vector<float> &stimulus);
+        CNN();
+        void Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l);
+        void Compile();
+        void Perceive(std::vector<float> &s);
     };
 }
 
