@@ -10,6 +10,7 @@
 #define common_h
 
 #include <iostream>
+#include <tuple>
 
 #include "stimuli.hpp"
 #include "brain.hpp"

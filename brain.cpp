@@ -10,21 +10,9 @@
 
 using namespace brain;
 
-/*std::vector<int> brain::MakeCircuitVector(int n_args, ...) {
-    std::vector<int> v;
-
-    va_list ap;
-    va_start(ap, n_args);
-        
-    for (int i = 1; i <= n_args; i++) {
-        int a = va_arg(ap, int);
-        v.push_back(a);
-    }
-    
-    va_end(ap);
-    
-    return v;
-}*/
+//
+//
+// brain::random functions
 
 float brain::MakeRandomP() {
     float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
@@ -46,9 +34,42 @@ float brain::MakeRandomNP() {
     return r1;
 }
 
+float brain::MakeRandomXavier(int ins, int outs) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    
+    float variance = 2.0 / (float) (ins + outs);
+    float stdev = sqrt(variance);
+    
+    std::normal_distribution<float> p((float) 0, stdev);
+    return p(gen);
+}
+
+//
+//
+// brain::activation & brain::derivation functions
+
+std::vector<std::vector<float>> brain::ActivationSigmoid(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = ActivationSigmoid(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
 float brain::ActivationSigmoid(float in) {
     float out = 1 / (1 + exp(-in));
     return out;
+}
+
+std::vector<std::vector<float>> brain::DerivativeSigmoid(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = DerivativeSigmoid(ins[i][j]);
+        }
+    }
+    return ins;
 }
 
 float brain::DerivativeSigmoid(float in) {
@@ -56,9 +77,27 @@ float brain::DerivativeSigmoid(float in) {
     return out;
 }
 
+std::vector<std::vector<float>> brain::ActivationTanh(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = ActivationTanh(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
 float brain::ActivationTanh(float in) {
     float out = (2 / (1 + exp(-2 * in))) - 1;
     return out;
+}
+
+std::vector<std::vector<float>> brain::DerivativeTanh(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = DerivativeTanh(ins[i][j]);
+        }
+    }
+    return ins;
 }
 
 float brain::DerivativeTanh(float in) {
@@ -66,9 +105,27 @@ float brain::DerivativeTanh(float in) {
     return out;
 }
 
+std::vector<std::vector<float>> brain::ActivationSoftplus(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = ActivationSoftplus(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
 float brain::ActivationSoftplus(float in) {
     float out = log(1 + exp(in));
     return out;
+}
+
+std::vector<std::vector<float>> brain::DerivativeSoftplus(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = DerivativeSoftplus(ins[i][j]);
+        }
+    }
+    return ins;
 }
 
 float brain::DerivativeSoftplus(float in) {
@@ -76,9 +133,27 @@ float brain::DerivativeSoftplus(float in) {
     return out;
 }
 
+std::vector<std::vector<float>> brain::ActivationReLu(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = ActivationReLu(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
 float brain::ActivationReLu(float in) {
     float out = std::max((float) 0, in);
     return out;
+}
+
+std::vector<std::vector<float>> brain::DerivativeReLu(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = DerivativeReLu(ins[i][j]);
+        }
+    }
+    return ins;
 }
 
 float brain::DerivativeReLu(float in) {
@@ -86,51 +161,133 @@ float brain::DerivativeReLu(float in) {
     return out;
 }
 
+std::vector<std::vector<float>> brain::ActivationELU(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = ActivationELU(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
+float brain::ActivationELU(float in) {
+    float out = std::max((float) 0, in);
+    if (out == 0) {
+        out = 1 * (exp(in) - 1);
+    }
+    return out;
+}
+
+std::vector<std::vector<float>> brain::DerivativeELU(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = DerivativeELU(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
+float brain::DerivativeELU(float in) {
+    float out = (in <= 0) ? (float) 0 : (float) 1;
+    if (out == 0) {
+        out = 1 * (exp(in));
+    }
+    return out;
+}
+
+std::vector<std::vector<float>> brain::ActivationReLuLeaky(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = ActivationReLuLeaky(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
+float brain::ActivationReLuLeaky(float in) {
+    float out = std::max((float) 0, in);
+    if (out == 0) {
+        out = 0.01 * in;
+    }
+    return out;
+}
+
+std::vector<std::vector<float>> brain::DerivativeReLuLeaky(std::vector<std::vector<float>> ins) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = DerivativeReLuLeaky(ins[i][j]);
+        }
+    }
+    return ins;
+}
+
+float brain::DerivativeReLuLeaky(float in) {
+    float out = (in <= 0) ? (float) 0.01 : (float) 1;
+    return out;
+}
+
+std::vector<std::vector<float>> brain::Activate(std::vector<std::vector<float>> ins, enum ACTIVATION_FUNC af) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = brain::Activate(ins[i][j], af);
+        }
+    }
+    return ins;
+}
+
 float brain::Activate(float in, enum ACTIVATION_FUNC af) {
     float out = (af == ACTIVATION_SIGMOID) ? ActivationSigmoid(in)
                 : (af == ACTIVATION_TANH) ? ActivationTanh(in)
                 : (af == ACTIVATION_SOFTPLUS) ? ActivationSoftplus(in)
-                : ActivationReLu(in);
+                : (af == ACTIVATION_RELU) ? ActivationReLu(in)
+                : (af == ACTIVATION_ELU) ? ActivationELU(in)
+                : ActivationReLuLeaky(in);
     return out;
+}
+
+std::vector<std::vector<float>> brain::Derive(std::vector<std::vector<float>> ins, enum ACTIVATION_FUNC af) {
+    for (int i = 0; i < ins.size(); i++) {
+        for (int j = 0; j < ins[i].size(); j++) {
+            ins[i][j] = brain::Derive(ins[i][j], af);
+        }
+    }
+    return ins;
 }
 
 float brain::Derive(float in, enum ACTIVATION_FUNC af) {
     float out = (af == ACTIVATION_SIGMOID) ? DerivativeSigmoid(in)
                 : (af == ACTIVATION_TANH) ? DerivativeTanh(in)
                 : (af == ACTIVATION_SOFTPLUS) ? DerivativeSoftplus(in)
-                : DerivativeReLu(in);
+                : (af == ACTIVATION_RELU) ? DerivativeReLu(in)
+                : (af == ACTIVATION_ELU) ? DerivativeELU(in)
+                : DerivativeReLuLeaky(in);
     return out;
 }
 
-std::vector<std::vector<float>> brain::MatrixDot(std::vector<std::vector<float>> m1, std::vector<std::vector<float>> m2) {
+//
+//
+// brain::matrix functions
+
+std::vector<std::vector<float>> brain::MatrixDot(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2) {
     assert(m1.size() == m2[0].size());
     assert(m1[0].size() == m2.size());
     
     std::vector<std::vector<float>> product;
     for (int i = 0; i < m1.size(); i++) {
         std::vector<float> t;
-        for (int j = 0; j < m1[i].size(); j++) {
+        for (int j = 0; j < m2[0].size(); j++) {
             t.push_back((float) 0);
         }
         product.push_back(t);
     }
     
     for (int i = 0; i < m1.size(); i++) {
-        for (int j = 0; j < m1[i].size(); j++) {
-            for (int k = 0; k < m2[i].size(); k++) {
+        for (int j = 0; j < m2[0].size(); j++) {
+            for (int k = 0; k < m1[0].size(); k++) {
                 product[i][j] += m1[i][k] * m2[k][j];
             }
         }
     }
-    
-    /*for (int i = 0; i <= m1.size() - 1; i++) {
-        std::vector<float> t;
-        for (int n = 0; n <= m1[i].size() - 1; n++) {
-            float p = m1[i][n] * m2[n][i];
-            t.push_back(p);
-        }
-        product.push_back(t);
-    }*/
     
     return product;
 }

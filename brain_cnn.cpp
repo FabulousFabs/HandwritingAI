@@ -29,8 +29,22 @@ std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::
 brain::layer::flatten_proto::flatten_proto(int n, enum brain::ACTIVATION_FUNC af) {
     this->i_nNeurons = n;
     this->e_iActivationFunc = af;
+}
+
+void brain::layer::flatten_proto::Excite(brain::layer_proto *next_layer) {
+    std::vector<std::vector<float>> neuronsOut;
+    neuronsOut.push_back(this->v_fNeurons);
+    this->v_fNeuronsOut = neuronsOut[0];
     
-    std::cout << this->i_nNeurons << std::endl;
+    for (int i = 0; i < this->v_fWeights[0].size() - 1; i++) {
+        neuronsOut.push_back(this->v_fNeuronsOut);
+    }
+    neuronsOut = neuronsOut; // i x j
+    std::vector<std::vector<float>> weights = this->v_fWeights; // j x i
+    
+    std::vector<std::vector<float>> p = brain::MatrixDot(neuronsOut, weights); // i x i (i times the output)
+    
+    next_layer->v_fNeurons = p[0];
 }
 
 //
@@ -44,13 +58,12 @@ std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::
 brain::layer::dense_proto::dense_proto(int n, enum brain::ACTIVATION_FUNC af) {
     this->i_nNeurons = n;
     this->e_iActivationFunc = af;
-    
-    std::cout << this->i_nNeurons << std::endl;
 }
 
 //
 //
 // CLASS brain::layer_proto
+
 void brain::layer_proto::Grow() {
     for (int i = 0; i < this->i_nNeurons; i++) {
         this->v_fNeurons.push_back((float) 0);
@@ -58,10 +71,46 @@ void brain::layer_proto::Grow() {
     }
 }
 
-void brain::layer_proto::Neuroplasticity(int n) {
-    for (int i = 0; i < n; i++) {
-        float p = brain::MakeRandomNP();
+void brain::layer_proto::Neuroplasticity(enum brain::WEIGHTS_INIT wi, int ins, int outs) {
+    for (int i = 0; i < this->v_fNeurons.size(); i++) {
+        std::vector<float> p;
+        for (int j = 0; j < outs; j++) {
+            float p1 = (wi == WEIGHTS_INIT_RANDOM) ? brain::MakeRandomNP() : brain::MakeRandomXavier(ins, outs);
+            p.push_back(p1);
+        }
         this->v_fWeights.push_back(p);
+    }
+}
+
+void brain::layer_proto::GetSensations(std::vector<float> s) {
+    assert(s.size() == this->v_fNeurons.size());
+    
+    for (int i = 0; i < s.size(); i++) {
+        this->v_fNeurons[i] = s[i];
+    }
+}
+
+void brain::layer_proto::Excite(brain::layer_proto *next_layer) {
+    std::vector<std::vector<float>> neurons;
+    neurons.push_back(this->v_fNeurons);
+    
+    std::vector<std::vector<float>> neuronsOut = brain::Activate(neurons, this->e_iActivationFunc);
+    this->v_fNeuronsOut = neuronsOut[0];
+    
+    for (int i = 0; i < this->v_fWeights[0].size() - 1; i++) {
+        neuronsOut.push_back(this->v_fNeuronsOut);
+    }
+    neuronsOut = neuronsOut; // i x j
+    std::vector<std::vector<float>> weights = this->v_fWeights; // j x i
+    
+    std::vector<std::vector<float>> p = brain::MatrixDot(neuronsOut, weights); // i x i (i times the output)
+    
+    next_layer->v_fNeurons = p[0];
+}
+
+void brain::layer_proto::Activate() {
+    for (int i = 0; i < this->v_fNeurons.size(); i++) {
+        this->v_fNeuronsOut[i] = brain::Activate(this->v_fNeurons[i], this->e_iActivationFunc);
     }
 }
 
@@ -85,7 +134,7 @@ void brain::CNN::Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum bra
     }
 }
 
-void brain::CNN::Compile() {
+void brain::CNN::Compile(enum brain::WEIGHTS_INIT wi) {
     assert(this->b_IsCompiled == false);
     
     // grow neurons
@@ -95,12 +144,42 @@ void brain::CNN::Compile() {
     
     // neuroplasticity
     for (int i = 0; i < this->Layers.size() - 1; i++) {
-        this->Layers[i].Neuroplasticity((int) this->Layers[i + 1].v_fNeurons.size());
+        int ins = (i > 0) ? (int) this->Layers[i - 1].v_fNeurons.size() : 0, outs = (int) this->Layers[i + 1].v_fNeurons.size();
+        this->Layers[i].Neuroplasticity(wi, ins, outs);
     }
     
     this->b_IsCompiled = true;
 }
 
-void brain::CNN::Perceive(std::vector<float> &s) {
+std::tuple<int, float> brain::CNN::Perceive(std::vector<float> &s) {
+    assert(this->b_IsCompiled == true);
     
+    this->Layers[0].GetSensations(s);
+    this->Layers[0].Excite(&this->Layers[1]);
+    
+    if (this->Layers.size() > 2) {
+        for (int i = 1; i < this->Layers.size() - 1; i++) {
+            this->Layers[i].Excite(&this->Layers[i + 1]);
+        }
+    }
+    
+    this->Layers[this->Layers.size() - 1].Activate();
+    
+    return this->GetChoice();
+}
+
+std::tuple<int, float> brain::CNN::GetChoice() {
+    assert(this->b_IsCompiled == true);
+    
+    float max = -2;
+    int maxN = 0;
+    
+    for (int i = 0; i < this->Layers[this->Layers.size() - 1].v_fNeuronsOut.size(); i++) {
+        if (this->Layers[this->Layers.size() - 1].v_fNeuronsOut[i] > max) {
+            max = this->Layers[this->Layers.size() - 1].v_fNeuronsOut[i];
+            maxN = i;
+        }
+    }
+    
+    return std::tuple<int, float>(maxN, max);
 }

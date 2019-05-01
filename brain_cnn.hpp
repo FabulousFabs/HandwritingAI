@@ -35,10 +35,13 @@ namespace brain {
     public:
         std::vector<float> v_fNeurons;
         std::vector<float> v_fNeuronsOut;
-        std::vector<float> v_fWeights;
+        std::vector<std::vector<float>> v_fWeights;
         
         void Grow();
-        void Neuroplasticity(int n);
+        void Neuroplasticity(enum brain::WEIGHTS_INIT wi, int ins, int outs);
+        void GetSensations(std::vector<float> s);
+        void Excite(brain::layer_proto *next_layer);
+        void Activate();
     };
     
     namespace layer {
@@ -48,6 +51,7 @@ namespace brain {
             
         public:
             flatten_proto(int n, enum ACTIVATION_FUNC af);
+            void Excite(brain::layer_proto *next_layer);
         };
         
         class dense_proto: public layer_proto
@@ -70,8 +74,9 @@ namespace brain {
     public:
         CNN();
         void Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l);
-        void Compile();
-        void Perceive(std::vector<float> &s);
+        void Compile(enum brain::WEIGHTS_INIT wi);
+        std::tuple<int, float> Perceive(std::vector<float> &s);
+        std::tuple<int, float> GetChoice();
     };
 }
 
