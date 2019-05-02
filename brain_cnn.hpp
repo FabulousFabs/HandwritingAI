@@ -28,11 +28,11 @@ namespace brain {
     class layer_proto
     {
     protected:
-        enum CNN_LAYER_TYPE e_iType;
-        enum ACTIVATION_FUNC e_iActivationFunc;
         int i_nNeurons;
         int i_nWeights;
     public:
+        enum CNN_LAYER_TYPE e_iType;
+        enum ACTIVATION_FUNC e_iActivationFunc;
         std::vector<float> v_fNeurons;
         std::vector<float> v_fNeuronsOut;
         std::vector<std::vector<float>> v_fWeights;
@@ -66,17 +66,25 @@ namespace brain {
         std::tuple<enum CNN_LAYER_TYPE, int, enum ACTIVATION_FUNC> Dense(int neurons, enum ACTIVATION_FUNC af);
     }
     
+    
+    
     class CNN
     {
     private:
         std::vector<layer_proto> Layers;
         bool b_IsCompiled;
+        float f_LearningRate;
+        enum brain::optimiser::OPTIMISER_TYPE e_iOptimiser;
+        enum brain::optimiser::LOSS_FUNC e_iLossFunc;
+        void StochasticGradientDescentOptimisation(int percept, int correct);
     public:
         CNN();
         void Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l);
-        void Compile(enum brain::WEIGHTS_INIT wi);
+        void Compile(enum brain::WEIGHTS_INIT wi, enum brain::optimiser::OPTIMISER_TYPE ot, enum brain::optimiser::LOSS_FUNC lf, float lr);
         std::tuple<int, float> Perceive(std::vector<float> &s);
         std::tuple<int, float> GetChoice();
+        void Feedback(int correct);
+        std::tuple<int, float> Train(std::vector<float> &s, int correct);
     };
 }
 

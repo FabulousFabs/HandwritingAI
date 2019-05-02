@@ -75,7 +75,9 @@ void brain::layer_proto::Neuroplasticity(enum brain::WEIGHTS_INIT wi, int ins, i
     for (int i = 0; i < this->v_fNeurons.size(); i++) {
         std::vector<float> p;
         for (int j = 0; j < outs; j++) {
-            float p1 = (wi == WEIGHTS_INIT_RANDOM) ? brain::MakeRandomNP() : brain::MakeRandomXavier(ins, outs);
+            float p1 = (wi == WEIGHTS_INIT_RANDOM) ? brain::MakeRandomNP()
+                        : (wi == WEIGHTS_INIT_XAVIER) ? brain::MakeRandomXavier(ins, outs)
+                        : (brain::MakeRandomNP() / 10);
             p.push_back(p1);
         }
         this->v_fWeights.push_back(p);
@@ -134,7 +136,7 @@ void brain::CNN::Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum bra
     }
 }
 
-void brain::CNN::Compile(enum brain::WEIGHTS_INIT wi) {
+void brain::CNN::Compile(enum brain::WEIGHTS_INIT wi = brain::WEIGHTS_INIT_XAVIER, enum brain::optimiser::OPTIMISER_TYPE ot = brain::optimiser::OPTIMISER_ADAM, enum brain::optimiser::LOSS_FUNC lf = brain::optimiser::LOSS_SPARSE_CATEGORICAL_CROSSENTROPY, float lr = 0.01) {
     assert(this->b_IsCompiled == false);
     
     // grow neurons
@@ -148,6 +150,9 @@ void brain::CNN::Compile(enum brain::WEIGHTS_INIT wi) {
         this->Layers[i].Neuroplasticity(wi, ins, outs);
     }
     
+    this->e_iOptimiser = ot;
+    this->e_iLossFunc = lf;
+    this->f_LearningRate = lr;
     this->b_IsCompiled = true;
 }
 
@@ -155,12 +160,9 @@ std::tuple<int, float> brain::CNN::Perceive(std::vector<float> &s) {
     assert(this->b_IsCompiled == true);
     
     this->Layers[0].GetSensations(s);
-    this->Layers[0].Excite(&this->Layers[1]);
     
-    if (this->Layers.size() > 2) {
-        for (int i = 1; i < this->Layers.size() - 1; i++) {
-            this->Layers[i].Excite(&this->Layers[i + 1]);
-        }
+    for (int i = 0; i < this->Layers.size() - 1; i++) {
+        this->Layers[i].Excite(&this->Layers[i + 1]);
     }
     
     this->Layers[this->Layers.size() - 1].Activate();
@@ -182,4 +184,63 @@ std::tuple<int, float> brain::CNN::GetChoice() {
     }
     
     return std::tuple<int, float>(maxN, max);
+}
+
+void brain::CNN::Feedback(int correct) {
+    int percept = std::get<0>(this->GetChoice());
+    
+    if (this->e_iOptimiser == brain::optimiser::OPTIMISER_SGD) {
+        this->StochasticGradientDescentOptimisation(percept, correct);
+    }
+}
+
+void brain::CNN::StochasticGradientDescentOptimisation(int percept, int correct) {
+    std::vector<float> errors_o = brain::Loss(this->Layers[this->Layers.size() - 1].v_fNeuronsOut, correct, this->e_iLossFunc);
+    
+    std::vector<std::vector<float>> error;
+    std::vector<std::vector<float>> delta;
+    for (int i = 0; i < this->Layers.size(); i++) {
+        std::vector<float> v;
+        std::vector<float> v2;
+        for (int j = 0; j < this->Layers[i].v_fNeuronsOut.size(); j++) {
+            if (i == this->Layers.size() - 1) {
+                v.push_back(errors_o[j] * brain::Derive(this->Layers[i].v_fNeurons[j], this->Layers[i].e_iActivationFunc));
+                v2.push_back(errors_o[j]);
+            } else {
+                v.push_back((float) 0);
+                v2.push_back((float) 0);
+            }
+        }
+        error.push_back(v2);
+        delta.push_back(v);
+    }
+    
+    for (int i = (int) this->Layers.size() - 2; i > 0; i--) {
+        for (int j = 0; j < this->Layers[i].v_fNeuronsOut.size(); j++) {
+            float error_n = 0, delta_n = 0;
+            
+            for (int k = 0; k < this->Layers[i].v_fWeights[j].size(); k++) {
+                error_n += error[i + 1][k] * this->Layers[i].v_fWeights[j][k] * brain::Derive(this->Layers[i].v_fNeurons[j], this->Layers[i].e_iActivationFunc);
+                //std::cout << error_n << std::endl;
+            }
+            
+            delta_n = error_n * brain::Derive(this->Layers[i].v_fNeuronsOut[j], this->Layers[i].e_iActivationFunc);
+            error[i][j] = error_n;
+            delta[i][j] = delta_n;
+        }
+    }
+    
+    for (int i = 0; i < this->Layers.size() - 1; i++) {
+        for (int j = 0; j < this->Layers[i].v_fNeuronsOut.size(); j++) {
+            for (int k = 0; k < this->Layers[i].v_fWeights[j].size(); k++) {
+                this->Layers[i].v_fWeights[j][k] = this->Layers[i].v_fWeights[j][k] - (this->f_LearningRate * delta[i][j]);
+            }
+        }
+    }
+}
+
+std::tuple<int, float> brain::CNN::Train(std::vector<float> &s, int correct) {
+    std::tuple<int, float> p = this->Perceive(s);
+    this->Feedback(correct);
+    return p;
 }

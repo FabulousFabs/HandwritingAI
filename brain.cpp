@@ -266,6 +266,47 @@ float brain::Derive(float in, enum ACTIVATION_FUNC af) {
 
 //
 //
+// brain::loss functions
+
+float brain::LossSparseCategoricalCrossEntropy(float obs, float exp) {
+    obs = (obs >= 1) ? 0.99 : obs; // in case output is SOFTPLUS
+    float out = (exp == 1) ? -log(obs) : -log(1 - obs);
+    return out;
+}
+
+float brain::LossSquare(float obs, float exp) {
+    float out = (exp - obs) * (exp - obs);
+    return out;
+}
+
+float brain::Loss(int percept, float p, int correct, enum brain::optimiser::LOSS_FUNC lf) {
+    float out = (lf == optimiser::LOSS_MEAN_SQUARE || lf == optimiser::LOSS_SQUARE) ? LossSquare(p, (percept == correct) ? 0.99 : 0.01)
+            : LossSparseCategoricalCrossEntropy(p, (percept == correct) ? 1 : 0);
+    return out;
+}
+
+std::vector<float> brain::Loss(std::vector<float> &outs, int correct, enum brain::optimiser::LOSS_FUNC lf) {
+    std::vector<float> v;
+    
+    for (int i = 0; i < outs.size(); i++) {
+        v.push_back(Loss(i, outs[i], correct, lf));
+    }
+    
+    float s = 0;
+    for (int i = 0; i < v.size(); i++) {
+        s += v[i];
+    }
+    
+    for (int i = 0; i < v.size(); i++) {
+        v[i] = (lf == optimiser::LOSS_MEAN_SQUARE) ? s / v.size()
+            : v[i];
+    }
+    
+    return v;
+}
+
+//
+//
 // brain::matrix functions
 
 std::vector<std::vector<float>> brain::MatrixDot(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2) {

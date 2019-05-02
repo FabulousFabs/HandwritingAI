@@ -26,7 +26,8 @@ namespace brain {
     enum WEIGHTS_INIT
     {
         WEIGHTS_INIT_RANDOM = 0,
-        WEIGHTS_INIT_XAVIER
+        WEIGHTS_INIT_XAVIER,
+        WEIGHTS_INIT_POINT_O_ONE
     };
     
     enum ACTIVATION_FUNC
@@ -38,6 +39,21 @@ namespace brain {
         ACTIVATION_ELU,
         ACTIVATION_RELU_LEAKY
     };
+    
+    namespace optimiser {
+        enum OPTIMISER_TYPE
+        {
+            OPTIMISER_ADAM = 0,
+            OPTIMISER_SGD
+        };
+        
+        enum LOSS_FUNC
+        {
+            LOSS_SPARSE_CATEGORICAL_CROSSENTROPY = 0,
+            LOSS_MEAN_SQUARE,
+            LOSS_SQUARE
+        };
+    }
     
     std::vector<std::vector<float>> ActivationSigmoid(std::vector<std::vector<float>> ins);
     float ActivationSigmoid(float in);
@@ -73,6 +89,12 @@ namespace brain {
     std::vector<std::vector<float>> Activate(std::vector<std::vector<float>> ins, enum ACTIVATION_FUNC af);
     float Derive(float in, enum ACTIVATION_FUNC af);
     std::vector<std::vector<float>> Derive(std::vector<std::vector<float>> ins, enum ACTIVATION_FUNC af);
+    
+    float LossSquare(float obs, float exp);
+    float LossSparseCategoricalCrossEntropy(float obs, float exp);
+    
+    float Loss(int percept, float p, int correct, enum optimiser::LOSS_FUNC lf);
+    std::vector<float> Loss(std::vector<float> &outs, int correct, enum optimiser::LOSS_FUNC lf);
     
     std::vector<std::vector<float>> MatrixDot(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
     void MatrixFill(bool r, float f, int u, std::vector<std::vector<float>> &m);

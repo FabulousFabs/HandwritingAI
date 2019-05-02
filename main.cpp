@@ -29,14 +29,35 @@ int main (int argc, const char *argv[]) {
     std::cout << "Stimuli are now loaded." << std::endl;
     
     brain::CNN cnn;
-    
     cnn.Sequential(brain::layer::Flatten(3, 16, 16, 1));
     cnn.Sequential(brain::layer::Dense(64, brain::ACTIVATION_RELU_LEAKY));
     cnn.Sequential(brain::layer::Dense(10, brain::ACTIVATION_SOFTPLUS));
-    cnn.Compile(brain::WEIGHTS_INIT_XAVIER);
+    cnn.Compile(
+                brain::WEIGHTS_INIT_XAVIER,
+                brain::optimiser::OPTIMISER_SGD,
+                brain::optimiser::LOSS_SQUARE,
+                0.5
+                );
     
-    std::tuple<int, float> p = cnn.Perceive(Stimuli[0].GSD);
-    std::cout << "Choice=" << std::get<0>(p) << "; p=" << std::get<1>(p) << std::endl;
+    int epoch = 0;
+    float alpha = 0.95;
+    float alpha_c = 0.00;
+    
+    while (alpha_c < alpha) {
+        epoch++;
+        
+        int success = 0;
+        for (auto&& s:Stimuli) {
+            std::tuple<int, float> p = cnn.Train(s.GSD, (int) s.Correct);
+            if (std::get<0>(p) == (int) s.Correct) {
+                success++;
+            }
+        }
+        
+        alpha_c = (float) success / (float) Stimuli.size();
+        
+        std::cout << "Epoch" << epoch << " done. Current alpha=" << alpha_c << " (success=" << success << ")." << std::endl;
+    }
     
     return 0;
 }
