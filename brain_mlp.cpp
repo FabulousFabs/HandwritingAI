@@ -1,18 +1,18 @@
 //
-//  brain_cnn.cpp
-//  CppCNNHandwriting
+//  brain_MLP.cpp
+//  CppMLPHandwriting
 //
 //  Created by Fabian Schneider on 30.04.19.
 //  Copyright © 2019 Fabian Schneider. All rights reserved.
 //
 
-#include "brain_cnn.hpp"
+#include "brain_MLP.hpp"
 
 //
 //
 // CLASS brain::layer::flatten_proto
 
-std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::layer::Flatten(int n_args, ...) {
+std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::layer::Flatten(int n_args, ...) {
     va_list ap;
     va_start(ap, n_args);
     
@@ -23,7 +23,7 @@ std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::
         neurons = neurons * n;
     }
     
-    return std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC>(CNN_LAYER_T_FLATTEN, neurons, ACTIVATION_SIGMOID);
+    return std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC>(MLP_LAYER_T_FLATTEN, neurons, ACTIVATION_SIGMOID);
 }
 
 brain::layer::flatten_proto::flatten_proto(int n, enum brain::ACTIVATION_FUNC af) {
@@ -51,8 +51,8 @@ void brain::layer::flatten_proto::Excite(brain::layer_proto *next_layer) {
 //
 // CLASS brain::layer::dense_proto
 
-std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::layer::Dense(int neurons, enum brain::ACTIVATION_FUNC af) {
-    return std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC>(CNN_LAYER_T_FLATTEN, neurons, af);
+std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> brain::layer::Dense(int neurons, enum brain::ACTIVATION_FUNC af) {
+    return std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC>(MLP_LAYER_T_FLATTEN, neurons, af);
 }
 
 brain::layer::dense_proto::dense_proto(int n, enum brain::ACTIVATION_FUNC af) {
@@ -118,16 +118,16 @@ void brain::layer_proto::Activate() {
 
 //
 //
-// CLASS brain::CNN
+// CLASS brain::MLP
 
-brain::CNN::CNN() {
+brain::MLP::MLP() {
     this->b_IsCompiled = false;
 }
 
-void brain::CNN::Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l) {
+void brain::MLP::Sequential(std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l) {
     assert(this->b_IsCompiled == false);
     
-    if (std::get<0>(l) == CNN_LAYER_T_FLATTEN) {
+    if (std::get<0>(l) == MLP_LAYER_T_FLATTEN) {
         brain::layer::flatten_proto ls(std::get<1>(l), std::get<2>(l));
         this->Layers.push_back(ls);
     } else {
@@ -136,7 +136,7 @@ void brain::CNN::Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum bra
     }
 }
 
-void brain::CNN::Compile(enum brain::WEIGHTS_INIT wi = brain::WEIGHTS_INIT_XAVIER, enum brain::optimiser::OPTIMISER_TYPE ot = brain::optimiser::OPTIMISER_ADAM, enum brain::optimiser::LOSS_FUNC lf = brain::optimiser::LOSS_SPARSE_CATEGORICAL_CROSSENTROPY, float lr = 0.01) {
+void brain::MLP::Compile(enum brain::WEIGHTS_INIT wi = brain::WEIGHTS_INIT_XAVIER, enum brain::optimiser::OPTIMISER_TYPE ot = brain::optimiser::OPTIMISER_ADAM, enum brain::optimiser::LOSS_FUNC lf = brain::optimiser::LOSS_SPARSE_CATEGORICAL_CROSSENTROPY, float lr = 0.01) {
     assert(this->b_IsCompiled == false);
     
     // grow neurons
@@ -156,7 +156,7 @@ void brain::CNN::Compile(enum brain::WEIGHTS_INIT wi = brain::WEIGHTS_INIT_XAVIE
     this->b_IsCompiled = true;
 }
 
-std::tuple<int, float> brain::CNN::Perceive(std::vector<float> &s) {
+std::tuple<int, float> brain::MLP::Perceive(std::vector<float> &s) {
     assert(this->b_IsCompiled == true);
     
     this->Layers[0].GetSensations(s);
@@ -170,7 +170,7 @@ std::tuple<int, float> brain::CNN::Perceive(std::vector<float> &s) {
     return this->GetChoice();
 }
 
-std::tuple<int, float> brain::CNN::GetChoice() {
+std::tuple<int, float> brain::MLP::GetChoice() {
     assert(this->b_IsCompiled == true);
     
     float max = -2;
@@ -186,7 +186,7 @@ std::tuple<int, float> brain::CNN::GetChoice() {
     return std::tuple<int, float>(maxN, max);
 }
 
-void brain::CNN::Feedback(int correct) {
+void brain::MLP::Feedback(int correct) {
     int percept = std::get<0>(this->GetChoice());
     
     if (this->e_iOptimiser == brain::optimiser::OPTIMISER_SGD) {
@@ -194,7 +194,7 @@ void brain::CNN::Feedback(int correct) {
     }
 }
 
-void brain::CNN::StochasticGradientDescentOptimisation(int percept, int correct) {
+void brain::MLP::StochasticGradientDescentOptimisation(int percept, int correct) {
     std::vector<float> errors_o = brain::Loss(this->Layers[this->Layers.size() - 1].v_fNeuronsOut, correct, this->e_iLossFunc);
     
     std::vector<std::vector<float>> error;
@@ -239,7 +239,7 @@ void brain::CNN::StochasticGradientDescentOptimisation(int percept, int correct)
     }
 }
 
-std::tuple<int, float> brain::CNN::Train(std::vector<float> &s, int correct) {
+std::tuple<int, float> brain::MLP::Train(std::vector<float> &s, int correct) {
     std::tuple<int, float> p = this->Perceive(s);
     this->Feedback(correct);
     return p;

@@ -1,6 +1,6 @@
 //
 //  main.cpp
-//  CppCNNHandwriting
+//  CppMLPHandwriting
 //
 //  Created by Fabian Schneider on 23.04.19.
 //  Copyright © 2019 Fabian Schneider. All rights reserved.
@@ -28,11 +28,15 @@ int main (int argc, const char *argv[]) {
     system("clear"); // libpng prints ugly iccp warnings bc it's stupid...
     std::cout << "Stimuli are now loaded." << std::endl;
     
-    brain::CNN cnn;
-    cnn.Sequential(brain::layer::Flatten(3, 16, 16, 1));
-    cnn.Sequential(brain::layer::Dense(64, brain::ACTIVATION_RELU_LEAKY));
-    cnn.Sequential(brain::layer::Dense(10, brain::ACTIVATION_SOFTPLUS));
-    cnn.Compile(
+    
+    
+    return 0;
+    
+    /*brain::MLP MLP;
+    MLP.Sequential(brain::layer::Flatten(3, 16, 16, 1));
+    MLP.Sequential(brain::layer::Dense(64, brain::ACTIVATION_RELU_LEAKY));
+    MLP.Sequential(brain::layer::Dense(10, brain::ACTIVATION_SOFTPLUS));
+    MLP.Compile(
                 brain::WEIGHTS_INIT_XAVIER,
                 brain::optimiser::OPTIMISER_SGD,
                 brain::optimiser::LOSS_SQUARE,
@@ -48,7 +52,7 @@ int main (int argc, const char *argv[]) {
         
         int success = 0;
         for (auto&& s:Stimuli) {
-            std::tuple<int, float> p = cnn.Train(s.GSD, (int) s.Correct);
+            std::tuple<int, float> p = MLP.Train(s.GSD, (int) s.Correct);
             if (std::get<0>(p) == (int) s.Correct) {
                 success++;
             }
@@ -59,5 +63,5 @@ int main (int argc, const char *argv[]) {
         std::cout << "Epoch" << epoch << " done. Current alpha=" << alpha_c << " (success=" << success << ")." << std::endl;
     }
     
-    return 0;
+    return 0;*/
 }

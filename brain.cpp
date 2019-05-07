@@ -1,6 +1,6 @@
 //
 //  brain.cpp
-//  CppCNNHandwriting
+//  CppMLPHandwriting
 //
 //  Created by Fabian Schneider on 24.04.19.
 //  Copyright © 2019 Fabian Schneider. All rights reserved.

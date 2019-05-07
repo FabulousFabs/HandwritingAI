@@ -1,13 +1,13 @@
 //
-//  brain_cnn.hpp
-//  CppCNNHandwriting
+//  brain_MLP.hpp
+//  CppMLPHandwriting
 //
 //  Created by Fabian Schneider on 30.04.19.
 //  Copyright © 2019 Fabian Schneider. All rights reserved.
 //
 
-#ifndef brain_cnn_hpp
-#define brain_cnn_hpp
+#ifndef brain_MLP_hpp
+#define brain_MLP_hpp
 
 #include <iostream>
 #include <vector>
@@ -19,10 +19,10 @@
 #include "brain.hpp"
 
 namespace brain {
-    enum CNN_LAYER_TYPE
+    enum MLP_LAYER_TYPE
     {
-        CNN_LAYER_T_FLATTEN = 0,
-        CNN_LAYER_T_DENSE,
+        MLP_LAYER_T_FLATTEN = 0,
+        MLP_LAYER_T_DENSE,
     };
     
     class layer_proto
@@ -31,7 +31,7 @@ namespace brain {
         int i_nNeurons;
         int i_nWeights;
     public:
-        enum CNN_LAYER_TYPE e_iType;
+        enum MLP_LAYER_TYPE e_iType;
         enum ACTIVATION_FUNC e_iActivationFunc;
         std::vector<float> v_fNeurons;
         std::vector<float> v_fNeuronsOut;
@@ -62,13 +62,13 @@ namespace brain {
             dense_proto(int n, enum ACTIVATION_FUNC af);
         };
         
-        std::tuple<enum CNN_LAYER_TYPE, int, enum ACTIVATION_FUNC> Flatten(int n_args, ...);
-        std::tuple<enum CNN_LAYER_TYPE, int, enum ACTIVATION_FUNC> Dense(int neurons, enum ACTIVATION_FUNC af);
+        std::tuple<enum MLP_LAYER_TYPE, int, enum ACTIVATION_FUNC> Flatten(int n_args, ...);
+        std::tuple<enum MLP_LAYER_TYPE, int, enum ACTIVATION_FUNC> Dense(int neurons, enum ACTIVATION_FUNC af);
     }
     
     
     
-    class CNN
+    class MLP
     {
     private:
         std::vector<layer_proto> Layers;
@@ -78,8 +78,8 @@ namespace brain {
         enum brain::optimiser::LOSS_FUNC e_iLossFunc;
         void StochasticGradientDescentOptimisation(int percept, int correct);
     public:
-        CNN();
-        void Sequential(std::tuple<enum brain::CNN_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l);
+        MLP();
+        void Sequential(std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l);
         void Compile(enum brain::WEIGHTS_INIT wi, enum brain::optimiser::OPTIMISER_TYPE ot, enum brain::optimiser::LOSS_FUNC lf, float lr);
         std::tuple<int, float> Perceive(std::vector<float> &s);
         std::tuple<int, float> GetChoice();
@@ -88,4 +88,4 @@ namespace brain {
     };
 }
 
-#endif /* brain_cnn_hpp */
+#endif /* brain_MLP_hpp */

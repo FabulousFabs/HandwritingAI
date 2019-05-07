@@ -104,6 +104,7 @@ namespace brain {
     std::vector<std::vector<float>> MatrixT(std::vector<std::vector<float>> &m);
 }
 
-#include "brain_cnn.hpp"
+#include "brain_mlp.hpp"
+#include "brain_pne.hpp"
 
 #endif /* brain_hpp */
