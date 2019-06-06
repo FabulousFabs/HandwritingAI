@@ -18,10 +18,10 @@
 
 namespace brain {
     //std::vector<int> MakeCircuitVector(int n_args, ...);
-    float MakeRandomP();
-    float MakeRandomN();
-    float MakeRandomNP();
-    float MakeRandomXavier(int ins, int outs);
+    double MakeRandomP();
+    double MakeRandomN();
+    double MakeRandomNP();
+    double MakeRandomXavier(int ins, int outs);
     
     enum WEIGHTS_INIT
     {
@@ -55,53 +55,58 @@ namespace brain {
         };
     }
     
-    std::vector<std::vector<float>> ActivationSigmoid(std::vector<std::vector<float>> ins);
-    float ActivationSigmoid(float in);
-    std::vector<std::vector<float>> DerivativeSigmoid(std::vector<std::vector<float>> ins);
-    float DerivativeSigmoid(float in);
+    std::vector<std::vector<double>> ActivationSigmoid(std::vector<std::vector<double>> ins);
+    double ActivationSigmoid(double in);
+    std::vector<std::vector<double>> DerivativeSigmoid(std::vector<std::vector<double>> ins);
+    double DerivativeSigmoid(double in);
     
-    float ActivationTanh(float in);
-    std::vector<std::vector<float>> ActivationTanh(std::vector<std::vector<float>> ins);
-    float DerivativeTanh(float in);
-    std::vector<std::vector<float>> DerivativeTanh(std::vector<std::vector<float>> ins);
+    double ActivationTanh(double in);
+    std::vector<std::vector<double>> ActivationTanh(std::vector<std::vector<double>> ins);
+    double DerivativeTanh(double in);
+    std::vector<std::vector<double>> DerivativeTanh(std::vector<std::vector<double>> ins);
     
-    float ActivationSoftplus(float in);
-    std::vector<std::vector<float>> ActivationSoftplus(std::vector<std::vector<float>> ins);
-    float DerivativeSoftplus(float in);
-    std::vector<std::vector<float>> DerivativeSoftplus(std::vector<std::vector<float>> ins);
+    double ActivationSoftplus(double in);
+    std::vector<std::vector<double>> ActivationSoftplus(std::vector<std::vector<double>> ins);
+    double DerivativeSoftplus(double in);
+    std::vector<std::vector<double>> DerivativeSoftplus(std::vector<std::vector<double>> ins);
     
-    float ActivationReLu(float in);
-    std::vector<std::vector<float>> ActivationReLu(std::vector<std::vector<float>> ins);
-    float DerivativeReLu(float in);
-    std::vector<std::vector<float>> DerivativeReLu(std::vector<std::vector<float>> ins);
+    double ActivationReLu(double in);
+    std::vector<std::vector<double>> ActivationReLu(std::vector<std::vector<double>> ins);
+    double DerivativeReLu(double in);
+    std::vector<std::vector<double>> DerivativeReLu(std::vector<std::vector<double>> ins);
     
-    float ActivationELU(float in);
-    std::vector<std::vector<float>> ActivationELU(std::vector<std::vector<float>> ins);
-    float DerivativeELU(float in);
-    std::vector<std::vector<float>> DerivativeELU(std::vector<std::vector<float>> ins);
+    double ActivationELU(double in);
+    std::vector<std::vector<double>> ActivationELU(std::vector<std::vector<double>> ins);
+    double DerivativeELU(double in);
+    std::vector<std::vector<double>> DerivativeELU(std::vector<std::vector<double>> ins);
     
-    float ActivationReLuLeaky(float in);
-    std::vector<std::vector<float>> ActivationReLuLeaky(std::vector<std::vector<float>> ins);
-    float DerivativeReLuLeaky(float in);
-    std::vector<std::vector<float>> DerivativeReLuLeaky(std::vector<std::vector<float>> ins);
+    double ActivationReLuLeaky(double in);
+    std::vector<std::vector<double>> ActivationReLuLeaky(std::vector<std::vector<double>> ins);
+    double DerivativeReLuLeaky(double in);
+    std::vector<std::vector<double>> DerivativeReLuLeaky(std::vector<std::vector<double>> ins);
     
-    float Activate(float in, enum ACTIVATION_FUNC af);
-    std::vector<std::vector<float>> Activate(std::vector<std::vector<float>> ins, enum ACTIVATION_FUNC af);
-    float Derive(float in, enum ACTIVATION_FUNC af);
-    std::vector<std::vector<float>> Derive(std::vector<std::vector<float>> ins, enum ACTIVATION_FUNC af);
+    double Activate(double in, enum ACTIVATION_FUNC af);
+    std::vector<std::vector<double>> Activate(std::vector<std::vector<double>> ins, enum ACTIVATION_FUNC af);
+    double Derive(double in, enum ACTIVATION_FUNC af);
+    std::vector<std::vector<double>> Derive(std::vector<std::vector<double>> ins, enum ACTIVATION_FUNC af);
     
-    float LossSquare(float obs, float exp);
-    float LossSparseCategoricalCrossEntropy(float obs, float exp);
+    double LossSquare(double obs, double exp);
+    double DeriveLossSquare(double in);
+    double LossSparseCategoricalCrossEntropy(double obs, double exp);
+    double DeriveLossSparseCategoricalCrossEntropy(double in);
     
-    float Loss(int percept, float p, int correct, enum optimiser::LOSS_FUNC lf);
-    std::vector<float> Loss(std::vector<float> &outs, int correct, enum optimiser::LOSS_FUNC lf);
+    double Loss(int percept, double p, int correct, enum optimiser::LOSS_FUNC lf);
+    std::vector<double> Loss(std::vector<double> &outs, int correct, enum optimiser::LOSS_FUNC lf);
     
-    std::vector<std::vector<float>> MatrixDot(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
-    void MatrixFill(bool r, float f, int u, std::vector<std::vector<float>> &m);
-    void MatrixOnes(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
-    void MatrixZeroes(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
-    void MatrixFit(std::vector<std::vector<float>> &m1, std::vector<std::vector<float>> &m2);
-    std::vector<std::vector<float>> MatrixT(std::vector<std::vector<float>> &m);
+    double DeriveLoss(double in, enum optimiser::LOSS_FUNC lf);
+    std::vector<double> DeriveLoss(std::vector<double> &ins, enum optimiser::LOSS_FUNC lf);
+    
+    std::vector<std::vector<double>> MatrixDot(std::vector<std::vector<double>> &m1, std::vector<std::vector<double>> &m2);
+    void MatrixFill(bool r, double f, int u, std::vector<std::vector<double>> &m);
+    void MatrixOnes(std::vector<std::vector<double>> &m1, std::vector<std::vector<double>> &m2);
+    void MatrixZeroes(std::vector<std::vector<double>> &m1, std::vector<std::vector<double>> &m2);
+    void MatrixFit(std::vector<std::vector<double>> &m1, std::vector<std::vector<double>> &m2);
+    std::vector<std::vector<double>> MatrixT(std::vector<std::vector<double>> &m);
 }
 
 #include "brain_mlp.hpp"

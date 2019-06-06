@@ -17,6 +17,7 @@
 #include <tuple>
 
 #include "brain.hpp"
+#include "main.h"
 
 namespace brain {
     enum MLP_LAYER_TYPE
@@ -33,13 +34,13 @@ namespace brain {
     public:
         enum MLP_LAYER_TYPE e_iType;
         enum ACTIVATION_FUNC e_iActivationFunc;
-        std::vector<float> v_fNeurons;
-        std::vector<float> v_fNeuronsOut;
-        std::vector<std::vector<float>> v_fWeights;
+        std::vector<double> v_fNeurons;
+        std::vector<double> v_fNeuronsOut;
+        std::vector<std::vector<double>> v_fWeights;
         
         void Grow();
         void Neuroplasticity(enum brain::WEIGHTS_INIT wi, int ins, int outs);
-        void GetSensations(std::vector<float> s);
+        void GetSensations(std::vector<double> s);
         void Excite(brain::layer_proto *next_layer);
         void Activate();
     };
@@ -73,18 +74,19 @@ namespace brain {
     private:
         std::vector<layer_proto> Layers;
         bool b_IsCompiled;
-        float f_LearningRate;
+        double f_LearningRate;
         enum brain::optimiser::OPTIMISER_TYPE e_iOptimiser;
         enum brain::optimiser::LOSS_FUNC e_iLossFunc;
         void StochasticGradientDescentOptimisation(int percept, int correct);
     public:
         MLP();
         void Sequential(std::tuple<enum brain::MLP_LAYER_TYPE, int, enum brain::ACTIVATION_FUNC> l);
-        void Compile(enum brain::WEIGHTS_INIT wi, enum brain::optimiser::OPTIMISER_TYPE ot, enum brain::optimiser::LOSS_FUNC lf, float lr);
-        std::tuple<int, float> Perceive(std::vector<float> &s);
-        std::tuple<int, float> GetChoice();
+        void Compile(enum brain::WEIGHTS_INIT wi, enum brain::optimiser::OPTIMISER_TYPE ot, enum brain::optimiser::LOSS_FUNC lf, double lr);
+        void Flush();
+        std::tuple<int, double> Perceive(std::vector<double> &s);
+        std::tuple<int, double> GetChoice();
         void Feedback(int correct);
-        std::tuple<int, float> Train(std::vector<float> &s, int correct);
+        std::tuple<int, double> Train(std::vector<double> &s, int correct);
     };
 }
 

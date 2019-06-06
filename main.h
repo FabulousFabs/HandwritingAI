@@ -12,6 +12,10 @@
 #include <iostream>
 #include <tuple>
 
+namespace xy {
+    void print(std::vector<std::vector<double>> m);
+}
+
 #include "stimuli.hpp"
 #include "brain.hpp"
 

@@ -31,8 +31,8 @@ namespace stimuli {
     
     struct Stimulus
     {
-        std::vector<float> GS;
-        std::vector<float> GSD;
+        std::vector<double> GS;
+        std::vector<double> GSD;
         std::string Type;
         std::string Variant;
         enum Type Correct;

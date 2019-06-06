@@ -7,3 +7,10 @@
 //
 
 #include "brain_pne.hpp"
+
+//
+// CLASS brain::PNE
+
+brain::PNE::PNE() {
+    this->b_IsCompiled = false;
+}

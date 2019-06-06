@@ -56,8 +56,8 @@ void stimuli::LoadStimulus(std::string path, std::string file, std::vector<Stimu
                 G = (int) *g,
                 B = (int) *b;
             
-            float m = 255,
-                  greyscale = 0.2126 * ((float) R / m) + 0.7152 * ((float) G / m) + 0.0722 * ((float) B / m),
+            double m = 255.0,
+                  greyscale = 0.2126 * ((double) R / m) + 0.7152 * ((double) G / m) + 0.0722 * ((double) B / m),
                   greyscaledark = abs(1-greyscale);
             
             stim.GS.push_back(greyscale);
